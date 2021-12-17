@@ -43,10 +43,6 @@ npm i -g email-tracker
 | a                                                     | a                                                     |
 | ----------------------------------------------------- | ----------------------------------------------------- |
 | ![Screenshot 1](docs/screenshots/email-tracker-1.png) | ![Screenshot 2](docs/screenshots/email-tracker-2.png) |
-
-![Screenshot 3](docs/screenshots/email-tracker-3.png)
-![Screenshot 4](docs/screenshots/email-tracker-4.png)
-![Screenshot 5](docs/screenshots/email-tracker-5.png)
-![Screenshot 6](docs/screenshots/email-tracker-6.png)
-![Screenshot 7](docs/screenshots/email-tracker-7.png)
-![Screenshot 8](docs/screenshots/email-tracker-8.png)
+| ![Screenshot 3](docs/screenshots/email-tracker-3.png) | ![Screenshot 4](docs/screenshots/email-tracker-4.png) |
+| ![Screenshot 5](docs/screenshots/email-tracker-5.png) | ![Screenshot 6](docs/screenshots/email-tracker-6.png) |
+| ![Screenshot 7](docs/screenshots/email-tracker-7.png) | ![Screenshot 8](docs/screenshots/email-tracker-8.png) |
