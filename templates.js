@@ -201,14 +201,17 @@ module.exports.TrackerDetailsPage = function TrackerDetailsPage(
 			? `
 				<p>You can track the email by pasting one of the snippets below.</p>
 				<img src="/tracker/${email.id}/open.gif" class="src tracker-selector" />
-				<pre class="url">&lt;img src=&quot;URL/tracker/${email.id}/open.gif&quot; /&gt;</pre>
 				<br />
-				<strong>Example E-Mail Footer:
+				<p>
+					<strong>You can also paste this example footer, the image is hidden in the <code>--</code>:</strong>
+				</p>
 				<p>
 					<strong>Joe Dart</strong><br/>
 					<img class="src" src="/tracker/${email.id}/open.gif" />-- <br/>
 					joe.dart@example.com
 				</p>
+				<br />
+				<code class="url">&lt;img src=&quot;URL/tracker/${email.id}/open.gif&quot; /&gt;</code>
 				<script type="module">
 					Array.from(document.querySelectorAll('.url')).forEach(el => {
 						el.textContent = el.textContent.replace('URL', location.protocol + '//' + location.host);
