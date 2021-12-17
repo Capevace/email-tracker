@@ -1,4 +1,6 @@
-![Email Tracker GIF](docs/screenshots/email-tracker.gif)
+<a href="docs/screenshots/email-tracker.mp4">
+    <img src="docs/screenshots/email-tracker-thumbnail.jpg" />
+</a>
 
 # `email-tracker`
 
