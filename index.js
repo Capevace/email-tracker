@@ -51,7 +51,9 @@ const logger = {
 		const log = type === 'ERROR' ? console.error : console.log;
 
 		log(
-			`${type} [${new Date().toISOString()}]	${title}	${message}\n${attachmentText}`
+			`${type} [${new Date().toISOString()}]	${title}	${message}${
+				attachment ? `\n${attachmentText}` : ''
+			}`
 		);
 	},
 	info: (...args) => logger._log('INFO', ...args),
