@@ -1,5 +1,5 @@
 <a href="docs/screenshots/email-tracker.mp4">
-    <img src="docs/screenshots/email-tracker-thumbnail.jpg" />
+    <img src="docs/screenshots/email-tracker-preview.jpg" />
 </a>
 
 # `email-tracker`
