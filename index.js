@@ -1,14 +1,64 @@
+#!/usr/bin/env node
+
 const path = require('path');
+const http = require('http');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cuid = require('cuid');
 
-const dbPath = path.resolve(
+const DB_PATH = path.resolve(
 	process.cwd(),
 	process.env.DB_PATH || 'email-tracker.db'
 );
 
-const db = require('better-sqlite3')(dbPath);
+const DEBUG = !!process.env.DEBUG;
+
+const logger = {
+	_log(type = 'DEBUG', title = 'main', message, options = {}) {
+		let attachment = options.attach || [];
+		let isError = false;
+
+		if (attachment instanceof Error) {
+			isError = true;
+
+			attachment = JSON.parse(
+				JSON.stringify(
+					attachment,
+					Object.getOwnPropertyNames(attachment)
+				)
+			);
+
+			if (attachment.stack)
+				attachment.stack = attachment.stack
+					.split('\n')
+					.map((line, index) =>
+						index === 0 ? line : `            ${line}`
+					)
+					.join('\n');
+		}
+
+		const attachmentText = Object.keys(attachment)
+			.map(
+				(key) =>
+					`    ${key} = ${
+						isError && typeof attachment[key] !== 'object'
+							? attachment[key]
+							: JSON.stringify(attachment[key])
+					}`
+			)
+			.join('\n');
+
+		const log = type === 'ERROR' ? console.error : console.log;
+
+		log(
+			`${type} [${new Date().toISOString()}]	${title}	${message}\n${attachmentText}`
+		);
+	},
+	info: (...args) => logger._log('INFO', ...args),
+	error: (...args) => logger._log('ERROR', ...args),
+};
+
+const db = require('better-sqlite3')(DB_PATH);
 const {
 	AnalyseTrackerPage,
 	CreateTrackerPage,
@@ -20,23 +70,26 @@ const {
 const PORT = process.env.PORT || 8080;
 
 const app = express();
+
+const httpServer = http.createServer(app);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(errorMiddleware);
 
 app.use('/static', express.static('static'));
 
-const email = {
-	id: '',
-	description: '',
-	createdAt: new Date(),
-};
+// const email = {
+// 	id: '',
+// 	description: '',
+// 	createdAt: new Date(),
+// };
 
-const emailEvent = {
-	id: '',
-	email: '',
-	type: '',
-	triggeredAt: new Date(),
-};
+// const emailEvent = {
+// 	id: '',
+// 	email: '',
+// 	type: '',
+// 	triggeredAt: new Date(),
+// };
 
 function install() {
 	db.prepare(
@@ -64,6 +117,16 @@ function install() {
 
 install();
 
+function errorMiddleware(req, res, next) {
+	res.error = (code = 500, message = 'Internal Server Error') => {
+		return res.status(500).json({
+			error: 'Internal server error',
+		});
+	};
+
+	return next(null, req, res, next);
+}
+
 // All Trackers
 app.get('/', (req, res) => {
 	try {
@@ -80,7 +143,6 @@ app.get('/', (req, res) => {
 		let emails = {};
 
 		for (const email of events) {
-			console.log(events);
 			if (
 				!(email.id in emails) ||
 				emails[email.id].triggeredAt > email.triggeredAt
@@ -93,26 +155,34 @@ app.get('/', (req, res) => {
 			.status(200)
 			.type('text/html')
 			.send(AllTrackersPage(Object.values(emails)));
-	} catch (e) {
-		console.error('Error during POST /track', e);
-		return res.status(500).json({
-			error: 'Internal server error',
+	} catch (error) {
+		logger.error('tracker', 'Could not fetch trackers', {
+			attach: error,
 		});
+
+		return res.error(500, 'Could not fetch trackers');
 	}
 });
 
 // Create a tracker page
 app.get('/tracker/create', (req, res) => {
-	return res.status(200).type('text/html').send(CreateTrackerPage());
+	try {
+		return res.status(200).type('text/html').send(CreateTrackerPage());
+	} catch (error) {
+		logger.error('tracker', 'Error showing tracker creation view', {
+			attach: error,
+		});
+
+		return res.error(500, 'Cannot display tracker creation');
+	}
 });
 
 // Create a tracker action
 app.post('/tracker/create', (req, res) => {
-	const description = String(
-		req.body ? req.body.description : req.query.description || ''
-	);
-
 	try {
+		const description = String(
+			req.body ? req.body.description : req.query.description || ''
+		);
 		const id = cuid();
 		const stmt = db.prepare(
 			'INSERT INTO emails (id, description, createdAt, activated) VALUES (?, ?, ?, ?)'
@@ -122,12 +192,16 @@ app.post('/tracker/create', (req, res) => {
 
 		stmt.run(id, description, createdAt.toISOString(), 0);
 
-		return res.status(200).redirect(`/tracker/${id}`);
-	} catch (e) {
-		console.error('Error during POST /track', e);
-		return res.status(500).json({
-			error: 'Internal server error',
+		logger.info('tracker', `Created Tracker`, {
+			attach: { id, description, createdAt, activated: 0 },
 		});
+		return res.status(200).redirect(`/tracker/${id}`);
+	} catch (error) {
+		logger.error('tracker', 'Could not create tracker', {
+			attach: error,
+		});
+
+		return res.error(500, 'Could not create tracker');
 	}
 });
 
@@ -154,11 +228,12 @@ app.get('/tracker/:id', (req, res) => {
 			.status(200)
 			.type('text/html')
 			.send(TrackerDetailsPage(email, events));
-	} catch (e) {
-		console.error('Error during GET /track/:id', e);
-		return res.status(500).json({
-			error: 'Internal server error',
+	} catch (error) {
+		logger.error('tracker', 'Could not display tracker details', {
+			attach: error,
 		});
+
+		return res.error(500, 'Unable to fetch tracker data');
 	}
 });
 
@@ -179,10 +254,15 @@ app.get('/tracker/:id/delete', (req, res) => {
 
 		return res.status(200).type('text/html').send(DeleteTrackerPage(email));
 	} catch (e) {
-		console.error('Error during GET /track/:id', e);
-		return res.status(500).json({
-			error: 'Internal server error',
-		});
+		logger.error(
+			'tracker',
+			'Could not display tracker deletion confirmation',
+			{
+				attach: error,
+			}
+		);
+
+		return res.error(500, 'Unable to fetch tracker data');
 	}
 });
 
@@ -204,12 +284,16 @@ app.post('/tracker/:id/delete', (req, res) => {
 		db.prepare('DELETE FROM emails WHERE id = ?').run(emailId);
 		db.prepare('DELETE FROM events WHERE email = ?').run(emailId);
 
-		return res.status(200).redirect(`/`);
-	} catch (e) {
-		console.error('Error during GET /track/:id', e);
-		return res.status(500).json({
-			error: 'Internal server error',
+		logger.info('tracker', `Deleted Tracker`, {
+			attach: { ...email, id: emailId },
 		});
+
+		return res.status(200).redirect(`/`);
+	} catch (error) {
+		logger.error('tracker', 'Could not delete tracker', {
+			attach: error,
+		});
+		return res.error(500, 'Unable to delete tracker');
 	}
 });
 
@@ -230,12 +314,16 @@ app.post('/tracker/:id/activate', (req, res) => {
 
 		db.prepare('UPDATE emails SET activated = 1 WHERE id = ?').run(emailId);
 
-		return res.status(200).redirect(`/tracker/${emailId}`);
-	} catch (e) {
-		console.error('Error during GET /track/:id', e);
-		return res.status(500).json({
-			error: 'Internal server error',
+		logger.info('tracker', `Activated Tracker`, {
+			attach: { ...email, activated: 1 },
 		});
+
+		return res.status(200).redirect(`/tracker/${emailId}`);
+	} catch (error) {
+		logger.error('tracker', 'Could not activate tracker', {
+			attach: error,
+		});
+		return res.error(500, 'Unable to activate tracker');
 	}
 });
 
@@ -256,12 +344,16 @@ app.post('/tracker/:id/deactivate', (req, res) => {
 
 		db.prepare('UPDATE emails SET activated = 0 WHERE id = ?').run(emailId);
 
-		return res.status(200).redirect(`/tracker/${emailId}`);
-	} catch (e) {
-		console.error('Error during GET /track/:id', e);
-		return res.status(500).json({
-			error: 'Internal server error',
+		logger.info('tracker', `Activated Tracker`, {
+			attach: { ...email, activated: 0 },
 		});
+
+		return res.status(200).redirect(`/tracker/${emailId}`);
+	} catch (error) {
+		logger.error('tracker', 'Could not deactivate tracker', {
+			attach: error,
+		});
+		return res.error(500, 'Unable to deactivate tracker');
 	}
 });
 
@@ -303,15 +395,22 @@ app.get('/tracker/:id/:event', (req, res) => {
 			new Date().toISOString()
 		);
 
+		logger.info('tracker', `Tracker event invoked`, {
+			attach: { ...email, event },
+		});
+
 		return res
 			.status(200)
 			.sendFile(path.resolve(__dirname, 'static/gif.gif'));
-	} catch (e) {
-		console.error('Error during GET /track/:id/:event', e);
-		return res.status(500).json({
-			error: 'Internal server error',
+	} catch (error) {
+		logger.error('tracker', 'Error during tracker event callback', {
+			attach: error,
 		});
+
+		return res.error(500, 'Internal Server Error');
 	}
 });
 
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+httpServer.listen(PORT, () =>
+	logger.info('main', `Server listening on port ${PORT}`)
+);

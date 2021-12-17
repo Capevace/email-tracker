@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "A simple server to track email opens.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "scripts": {},
+  "bin": {
+    "email-tracker": "index.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,10 @@
     "better-sqlite3": "^7.4.5",
     "body-parser": "^1.19.0",
     "cuid": "^2.1.8",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "storyboard": "^3.3.2",
+    "storyboard-listener-browser-extension": "^3.3.2",
+    "storyboard-listener-ws-server": "^3.3.2",
+    "storyboard-preset-console": "^3.3.2"
   }
 }

@@ -8,6 +8,8 @@ RUN npm install
 
 COPY . .
 
+ENV DB_PATH=/data/email-tracker.db
+
 EXPOSE 8080
 
-CMD [ "node", "start.js" ]
+CMD [ "node", "/usr/src/app/index.js" ]
