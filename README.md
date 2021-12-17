@@ -1,4 +1,4 @@
-<a href="docs/screenshots/email-tracker.mp4">
+<a href="https://raw.githubusercontent.com/Capevace/email-tracker/main/docs/screenshots/email-tracker.mp4">
     <img src="docs/screenshots/email-tracker-preview.jpg" />
 </a>
 
