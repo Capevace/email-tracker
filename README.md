@@ -1,3 +1,5 @@
+![Screenshot 2](docs/screenshots/email-tracker-2.png)
+
 # `email-tracker`
 
 > A simple server to track email opens
@@ -40,7 +42,7 @@ npm i -g email-tracker
 
 ## Screenshots
 
-| a                                                     | a                                                     |
+|                                                       |                                                       |
 | ----------------------------------------------------- | ----------------------------------------------------- |
 | ![Screenshot 1](docs/screenshots/email-tracker-1.png) | ![Screenshot 2](docs/screenshots/email-tracker-2.png) |
 | ![Screenshot 3](docs/screenshots/email-tracker-3.png) | ![Screenshot 4](docs/screenshots/email-tracker-4.png) |
