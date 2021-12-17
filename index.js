@@ -2,7 +2,13 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cuid = require('cuid');
-const db = require('better-sqlite3')('./email-tracker.db');
+
+const dbPath = path.resolve(
+	process.cwd(),
+	process.env.DB_PATH || 'email-tracker.db'
+);
+
+const db = require('better-sqlite3')(dbPath);
 const {
 	AnalyseTrackerPage,
 	CreateTrackerPage,
