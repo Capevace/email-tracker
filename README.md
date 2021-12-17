@@ -1,4 +1,4 @@
-![Screenshot 2](docs/screenshots/email-tracker-2.png)
+![Email Tracker GIF](docs/screenshots/email-tracker.gif)
 
 # `email-tracker`
 
