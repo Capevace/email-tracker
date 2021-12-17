@@ -1,0 +1,43 @@
+.flex {
+	display: flex;
+}
+
+.justify-around {
+	justify-content: space-around;
+}
+
+.justify-between {
+	justify-content: space-between;
+}
+
+.spacer-sm {
+	margin-left: 0.2rem;
+	margin-right: 0.2rem;
+}
+
+.spacer {
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+
+.danger {
+	color: var(--del-color);
+}
+
+.tracker-selector {
+	width: 200px;
+	height: 200px;
+	background: url(https://dummyimage.com/300x300/e0e0e0/363636.png&text=Copy+me);
+	background-size: auto;
+	margin-bottom: 30px;
+	background-size: cover;
+}
+
+.layout-grid-aside {
+	grid-column-gap: 3rem;
+	grid-template-columns: auto 25%;
+}
+
+.muted {
+	color: var(--muted-color);
+}

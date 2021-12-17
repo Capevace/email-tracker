@@ -1,0 +1,31 @@
+{
+  "name": "email-tracker",
+  "version": "1.0.0",
+  "description": "A simple server to track email opens.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/capevace/email-tracker.git"
+  },
+  "keywords": [
+    "email",
+    "tracker",
+    "meta",
+    "open"
+  ],
+  "author": "Lukas Mateffy (@capevace)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/capevace/email-tracker/issues"
+  },
+  "homepage": "https://github.com/capevace/email-tracker#readme",
+  "dependencies": {
+    "better-sqlite3": "^7.4.5",
+    "body-parser": "^1.19.0",
+    "cuid": "^2.1.8",
+    "express": "^4.17.1"
+  }
+}
