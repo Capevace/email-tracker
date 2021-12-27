@@ -10,10 +10,18 @@
 
 ### Using with Docker
 
-You can download the package from npm.
+You can download the container from docker _(armv7 only)_.
 
 ```bash
 docker pull capevace/email-tracker
+```
+
+You can also build your own docker image by cloning the repo and then building it.
+
+```bash
+git clone https://github.com/capevace/email-tracker
+cd email-tracker
+docker build . -t capevace/email-tracker
 ```
 
 ### Using with npm
