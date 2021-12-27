@@ -33,11 +33,18 @@
 	background-size: cover;
 }
 
-.layout-grid-aside {
-	grid-column-gap: 3rem;
-	grid-template-columns: auto 25%;
+@media (min-width: 992px) {
+	.layout-grid-aside {
+		grid-column-gap: 3rem;
+		grid-template-columns: auto 40%;
+	}
 }
 
 .muted {
 	color: var(--muted-color);
+}
+
+table.align-top td,
+table.align-top td * {
+	vertical-align: top;
 }
