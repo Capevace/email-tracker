@@ -4,7 +4,7 @@
 
 # `email-tracker`
 
-> A simple server to track email opens
+> Create trackers that tell you when emails were opened by embedding hidden images
 
 ## Usage
 
@@ -50,3 +50,27 @@ npm i -g email-tracker
 | ![Screenshot 3](docs/screenshots/email-tracker-3.png) | ![Screenshot 4](docs/screenshots/email-tracker-4.png) |
 | ![Screenshot 5](docs/screenshots/email-tracker-5.png) | ![Screenshot 6](docs/screenshots/email-tracker-6.png) |
 | ![Screenshot 7](docs/screenshots/email-tracker-7.png) | ![Screenshot 8](docs/screenshots/email-tracker-8.png) |
+
+## Changelog
+
+### 2.0.0
+
+-   **➕ Added header tracking**
+
+    When the hidden image is loaded, header information sent along with the request will be saved in the database. This is useful to determine if the tracker was invoked not by a genuine open, but by a proxy caching email resources beforehand (GMail does this for example).
+
+-   **🩺 Fixed mobile layout issues**
+
+#### Migration notice
+
+If you've previously used v1.0.0, you'll need to run the following SQL
+on your SQLite `.db`, in order to make it compatible with v2.0.0:
+
+```sql
+ALTER TABLE events
+  ADD headers TEXT;
+```
+
+### 1.0.0
+
+-   **🚀 Initial release**
