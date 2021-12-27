@@ -1,3 +1,5 @@
+const { encode: encodeHtmlEntities } = require('html-entities');
+
 function template({ title = null, subtitle = null, backUrl = null }, body) {
 	return `
 		<!DOCTYPE html>
@@ -66,48 +68,50 @@ module.exports.AllTrackersPage = function AllTrackersPage(trackers = []) {
 		`
 		
 		<div class="data">
-			<table role="grid">
-				<thead>
-					<tr>
-						<th scope="col">Description</th>
-						<th scope="col">Opened?</th>
-						<th scope="col">Created At</th>
-						<th scope="col">Active?</th>
-						<th scope="col"></th>
-					</tr>
-				</thead>
-				<tbody>
-					${trackers
-						.map(
-							(track) => `
+			<figure>
+				<table role="grid">
+					<thead>
 						<tr>
-							<th scope="row">${track.description}</th>
-							<td>${
-								track.type === 'open'
-									? `<ins>Opened at ${new Date(
-											track.triggeredAt
-									  ).toLocaleString()}</ins>`
-									: 'Not opened'
-							}</td>
-							<td>${new Date(track.createdAt).toLocaleString()}</td>
-							<td>${
-								track.activated === 1
-									? `Active`
-									: '<span class="danger">Not active</span>'
-							}</td>
-							<td>
-								<div class="flex justify-around">
-									<a href="/tracker/${track.id}">Details</a>
-									<span class="spacer-sm">|</span>
-									<a href="/tracker/${track.id}/delete">Delete</a>
-								</div>
-							</td>
+							<th scope="col">Description</th>
+							<th scope="col">Opened?</th>
+							<th scope="col">Created At</th>
+							<th scope="col">Active?</th>
+							<th scope="col"></th>
 						</tr>
-					`
-						)
-						.join('\n')}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						${trackers
+							.map(
+								(track) => `
+							<tr>
+								<th scope="row">${track.description}</th>
+								<td>${
+									track.type === 'open'
+										? `<ins>Opened at ${new Date(
+												track.triggeredAt
+										  ).toLocaleString()}</ins>`
+										: 'Not opened'
+								}</td>
+								<td>${new Date(track.createdAt).toLocaleString()}</td>
+								<td>${
+									track.activated === 1
+										? `Active`
+										: '<span class="danger">Not active</span>'
+								}</td>
+								<td>
+									<div class="flex justify-around">
+										<a href="/tracker/${track.id}">Details</a>
+										<span class="spacer-sm">|</span>
+										<a href="/tracker/${track.id}/delete">Delete</a>
+									</div>
+								</td>
+							</tr>
+						`
+							)
+							.join('\n')}
+					</tbody>
+				</table>
+			</figure>
 			${
 				trackers.length === 0
 					? `
@@ -150,28 +154,47 @@ module.exports.TrackerDetailsPage = function TrackerDetailsPage(
 ) {
 	function AnalyseSection(email, events = []) {
 		return `
-			<table role="grid">
+		<figure>
+			<table role="grid" class="align-top">
 				<thead>
 					<tr>
 						<th scope="col">ID</th>
 						<th scope="col">Type</th>
 						<th scope="col">Triggered At</th>
+						<th scope="col">Headers</th>
 					</tr>
 				</thead>
 				<tbody>
 					${events
-						.map(
-							(event) => `
-						<tr>
-							<th scope="row">${event.id}</th>
-							<td>${event.type}</td>
-							<td>${new Date(event.triggeredAt).toLocaleString()}</td>
-						</tr>
-					`
-						)
+						.map((event) => {
+							const headers = JSON.parse(event.headers);
+
+							return `
+								<tr>
+									<td>${event.id}</td>
+									<td>${event.type}</td>
+									<td>${new Date(event.triggeredAt).toLocaleString()}</td>
+									<td>
+										<details>
+											<summary>View headers</summary>
+											${Object.entries(headers)
+												.map(
+													([key, value]) =>
+														`<small class="muted">
+															<strong>${key}:</strong>
+														</small><br>
+														${value}`
+												)
+												.join(' <br> <br> ')}
+										</details>
+									</td>
+								</tr>
+							`;
+						})
 						.join('\n')}
 				</tbody>
 			</table>
+		</figure>
 		`;
 	}
 
@@ -250,38 +273,43 @@ module.exports.TrackerDetailsPage = function TrackerDetailsPage(
 						</hgroup>
 						${ActivateTrackerSection(email)}
 					</section>
-					<section>
-						<hgroup>
-							<h3>Analyse tracker events</h3>
-							<h4>The tracker will not accept events until it is activated, so you can embed it without triggering an open.</h4>
-						</hgroup>
-						${AnalyseSection(email, events)}
-					</section>
 				</section>
 				<aside>
 					<article style="margin-top: 0px; padding: 1rem 1.5rem;">
-						<p>
-							<strong>${email.description}</strong>
-						</p>
+						<strong>${email.description}</strong><br>
+						<small class="muted">Description</small>
 
-						<strong>Activated?</strong>
-						<p>
-							${email.activated === 1 ? `<ins>Active</ins>` : `Not active`}
-						</p>
+						<br><br>
 
-						<strong>Was opened?</strong>
-						<p>
+						<strong>${
+							email.activated === 1
+								? `<ins>Active</ins>`
+								: `Not active`
+						}</strong><br>
+						<small class="muted">Activated?</small>
+						
+						<br><br>
+						
+						<strong>
 							${
 								events.length > 0
-									? `<ins>Opened on ${new Date(
+									? `<ins>Opened on <br>${new Date(
 											events[0].triggeredAt
 									  ).toLocaleString()}</ins>`
 									: `<span class="muted">Unopened</span>`
 							}
-						</p>
+						</strong><br>
+						<small class="muted">Opened?</small>
 					</article>
 				</aside>
 			</div>
+			<section>
+				<hgroup>
+					<h3>Analyse tracker events</h3>
+					<h4>The tracker will not accept events until it is activated, so you can embed it without triggering an open.</h4>
+				</hgroup>
+				${AnalyseSection(email, events)}
+			</section>
 	`
 	);
 };

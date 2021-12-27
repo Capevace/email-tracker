@@ -111,7 +111,8 @@ function install() {
 			id TEXT PRIMARY KEY,
 			email TEXT,
 			type TEXT,
-			triggeredAt TEXT
+			triggeredAt TEXT,
+			headers TEXT
 		)
 	`
 	).run();
@@ -388,13 +389,14 @@ app.get('/tracker/:id/:event', (req, res) => {
 		}
 
 		const stmt = db.prepare(
-			'INSERT INTO events (id, email, type, triggeredAt) VALUES (?, ?, ?, ?)'
+			'INSERT INTO events (id, email, type, triggeredAt, headers) VALUES (?, ?, ?, ?, ?)'
 		);
 		const info = stmt.run(
 			cuid(),
 			email.id,
 			event,
-			new Date().toISOString()
+			new Date().toISOString(),
+			JSON.stringify(req.headers)
 		);
 
 		logger.info('tracker', `Tracker event invoked`, {

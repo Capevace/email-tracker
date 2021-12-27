@@ -28,6 +28,7 @@
     "body-parser": "^1.19.0",
     "cuid": "^2.1.8",
     "express": "^4.17.1",
+    "html-entities": "^2.3.2",
     "storyboard": "^3.3.2",
     "storyboard-listener-browser-extension": "^3.3.2",
     "storyboard-listener-ws-server": "^3.3.2",
