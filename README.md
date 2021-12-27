@@ -53,6 +53,10 @@ npm i -g email-tracker
 
 ## Changelog
 
+### 2.0.1
+
+-   **🩺 Removed documentation images from NPM release (20MB+ -> 17kb package size)**
+
 ### 2.0.0
 
 -   **➕ Added header tracking**
